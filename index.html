@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OROVIA eCard Builder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <meta name="description" content="Build your own luxury digital business card with live preview and custom themes.">
+</head>
+<body>
+    <div class="app-container">
+        <!-- ================== BUILDER PANEL (LEFT) ================== -->
+        <aside class="builder-panel">
+            <header class="builder-header">
+                <img src="/OROVIA_Logo_-_NO_bg_-_color.png" alt="OROVIA Logo" class="builder-logo">
+                <h1>OROVIA eCard Builder</h1>
+                <p>Customize your card in real-time.</p>
+                <div class="undo-redo-controls">
+                    <!-- Undo/Redo buttons moved to mobile-action-bar for mobile view -->
+                </div>
+            </header>
+
+            <nav class="builder-tabs">
+                <button class="tab-link active" data-tab="basic"><i class="fas fa-user-edit"></i></button>
+                <button class="tab-link" data-tab="typography"><i class="fas fa-font"></i></button>
+                <button class="tab-link" data-tab="themes"><i class="fas fa-palette"></i></button>
+                <button class="tab-link" data-tab="social"><i class="fas fa-share-alt"></i></button>
+                <button class="tab-link" data-tab="layout"><i class="fas fa-ruler-combined"></i></button>
+            </nav>
+
+            <div class="builder-content">
+                <!-- Basic Information -->
+                <div id="tab-basic" class="tab-pane active">
+                    <div class="section-content">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" value="Alex Morgan">
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Job Title</label>
+                            <input type="text" id="title" value="Creative Director">
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company</label>
+                            <input type="text" id="company" value="Visionary Studio">
+                        </div>
+                        <div class="form-group">
+                            <label for="quote">Quote</label>
+                            <input type="text" id="quote" value="Design is intelligence made visible.">
+                        </div>
+                         <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" value="alex.morgan@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" value="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" id="address" value="1234 Sunset Blvd, Los Angeles, CA">
+                        </div>
+                        
+                        <details open>
+                            <summary><i class="fas fa-camera"></i> Profile Photo Settings</summary>
+                            <div class="element-controls">
+                                <div class="form-group">
+                                    <label for="photo-upload">Upload Photo</label>
+                                    <input type="file" id="photo-upload" accept="image/*">
+                                </div>
+                                <div class="form-group">
+                                    <label for="photo-size">Size (px)</label>
+                                    <input type="number" id="photo-size" min="50" max="300" step="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="photo-border-radius">Shape (Border Radius %)</label>
+                                    <input type="range" id="photo-border-radius" min="0" max="50" step="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="photo-filter">Filter</label>
+                                    <select id="photo-filter">
+                                        <option value="none">None</option>
+                                        <option value="grayscale">Grayscale</option>
+                                        <option value="sepia">Sepia</option>
+                                        <option value="blur">Blur</option>
+                                        <option value="brightness">Brightness</option>
+                                        <option value="contrast">Contrast</option>
+                                        <option value="saturate">Saturation</option>
+                                        <option value="hue-rotate">Hue Rotate</option>
+                                        <option value="invert">Invert</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="photo-filter-intensity-group" style="display: none;">
+                                    <label for="photo-filter-intensity">Filter Intensity (0-100)</label>
+                                    <input type="range" id="photo-filter-intensity" min="0" max="100" step="1">
+                                </div>
+                                <div class="form-group toggle-group">
+                                    <span>Enable Glow</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="photo-glow-toggle">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="photo-glow-color">Glow Color</label>
+                                    <input type="color" id="photo-glow-color">
+                                </div>
+                                <div class="form-group">
+                                    <label for="photo-glow-spread">Glow Spread (px)</label>
+                                    <input type="range" id="photo-glow-spread" min="0" max="30" step="1">
+                                </div>
+
+                                <!-- NEW: Toggle to show/hide profile photo -->
+                                <div class="form-group toggle-group">
+                                    <span>Show Profile Photo</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="photo-show-toggle" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Typography -->
+                <div id="tab-typography" class="tab-pane">
+                    <div class="section-content">
+                        <div class="typography-element-settings">
+                            <details open>
+                                <summary><i class="fas fa-heading"></i> Name Typography</summary>
+                                <div class="element-controls">
+                                    <div class="form-group">
+                                        <label for="name-font-family">Font Family</label>
+                                        <select id="name-font-family"></select>
+                                    </div>
+                                    <div class="font-size-weight-group">
+                                        <div class="form-group">
+                                            <label for="name-font-size">Font Size (px)</label>
+                                            <input type="number" id="name-font-size" min="10" max="100" step="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name-font-weight">Font Weight</label>
+                                            <select id="name-font-weight"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="name-text-align">Text Alignment</label>
+                                        <select id="name-text-align"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="name-color">Color</label>
+                                        <input type="color" id="name-color">
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary><i class="fas fa-briefcase"></i> Job Title Typography</summary>
+                                <div class="element-controls">
+                                    <div class="form-group">
+                                        <label for="title-font-family">Font Family</label>
+                                        <select id="title-font-family"></select>
+                                    </div>
+                                    <div class="font-size-weight-group">
+                                        <div class="form-group">
+                                            <label for="title-font-size">Font Size (px)</label>
+                                            <input type="number" id="title-font-size" min="10" max="100" step="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="title-font-weight">Font Weight</label>
+                                            <select id="title-font-weight"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="title-text-align">Text Alignment</label>
+                                        <select id="title-text-align"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="title-color">Color</label>
+                                        <input type="color" id="title-color">
+                                    </div>
+                                </div>
+                            </details>
+                            
+                            <details>
+                                <summary><i class="fas fa-building"></i> Company Typography</summary>
+                                <div class="element-controls">
+                                    <div class="form-group">
+                                        <label for="company-font-family">Font Family</label>
+                                        <select id="company-font-family"></select>
+                                    </div>
+                                    <div class="font-size-weight-group">
+                                        <div class="form-group">
+                                            <label for="company-font-size">Font Size (px)</label>
+                                            <input type="number" id="company-font-size" min="10" max="100" step="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="company-font-weight">Font Weight</label>
+                                            <select id="company-font-weight"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="company-text-align">Text Alignment</label>
+                                        <select id="company-text-align"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="company-color">Color</label>
+                                        <input type="color" id="company-color">
+                                    </div>
+                                </div>
+                            </details>
+                            
+                            <details>
+                                <summary><i class="fas fa-map-marker-alt"></i> Address Typography</summary>
+                                <div class="element-controls">
+                                    <div class="form-group">
+                                        <label for="address-font-family">Font Family</label>
+                                        <select id="address-font-family"></select>
+                                    </div>
+                                    <div class="font-size-weight-group">
+                                        <div class="form-group">
+                                            <label for="address-font-size">Font Size (px)</label>
+                                            <input type="number" id="address-font-size" min="10" max="100" step="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="address-font-weight">Font Weight</label>
+                                            <select id="address-font-weight"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address-text-align">Text Alignment</label>
+                                        <select id="address-text-align"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address-color">Color</label>
+                                        <input type="color" id="address-color">
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary><i class="fas fa-quote-right"></i> Quote Typography</summary>
+                                <div class="element-controls">
+                                    <div class="form-group">
+                                        <label for="quote-font-family">Font Family</label>
+                                        <select id="quote-font-family"></select>
+                                    </div>
+                                    <div class="font-size-weight-group">
+                                        <div class="form-group">
+                                            <label for="quote-font-size">Font Size (px)</label>
+                                            <input type="number" id="quote-font-size" min="10" max="100" step="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="quote-font-weight">Font Weight</label>
+                                            <select id="quote-font-weight"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="quote-text-align">Text Alignment</label>
+                                        <select id="quote-text-align"></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="quote-color">Color</label>
+                                        <input type="color" id="quote-color">
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                        <hr>
+                        <label>Text Element Order</label>
+                        <div id="text-elements-order-builder" class="sortable-list text-element-order-list">
+                            <!-- Orderable elements will be generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Themes & Backgrounds -->
+                <div id="tab-themes" class="tab-pane">
+                    <div class="section-content">
+                        <label>Theme</label>
+                        <div class="theme-selector" id="theme-selector">
+                            <button class="theme-option active" data-theme="luxury">Luxury</button>
+                            <button class="theme-option" data-theme="tech">Tech</button>
+                            <button class="theme-option" data-theme="beauty">Beauty</button>
+                            <button class="theme-option" data-theme="barber">Barber</button>
+                            <button class="theme-option" data-theme="media">Media</button>
+                            <button class="theme-option" data-theme="fun">Fun</button>
+                        </div>
+                        <hr>
+                        <label>Floating Emojis</label>
+                         <div class="form-group toggle-group">
+                            <span>Enable Emojis</span>
+                            <label class="switch">
+                                <input type="checkbox" id="emoji-toggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="emoji-size">Emoji Size</label>
+                            <select id="emoji-size">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                        <!-- New Custom Emojis picker -->
+                        <div class="form-group">
+                            <label>Custom Emojis</label>
+                            <div class="emoji-picker-container">
+                                <div id="custom-emojis-display" class="selected-emojis-display">
+                                    <!-- Selected emojis will appear here -->
+                                </div>
+                                <button id="open-emoji-picker-btn" class="text-btn">
+                                    <i class="fas fa-plus"></i> Select Emojis
+                                </button>
+                                <div id="emoji-picker-popup" class="emoji-picker-popup">
+                                    <!-- Emoji options will be generated here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emoji-density">Emoji Density <span id="emoji-density-value">(50%)</span></label>
+                            <input type="range" id="emoji-density" min="1" max="100" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div id="tab-social" class="tab-pane">
+                    <div class="section-content">
+                        <div id="social-links-builder" class="sortable-list"></div>
+                        <button id="add-social-btn" class="text-btn"><i class="fas fa-plus"></i> Add Social Link</button>
+                        <hr>
+                        <label>Display Style</label>
+                        <div class="layout-selector" id="social-layout-selector">
+                            <button class="layout-option active" data-layout="full-label"><i class="fas fa-align-left"></i> Full Label</button>
+                            <button class="layout-option" data-layout="icon-only"><i class="fas fa-ellipsis-h"></i> Icon-Only</button>
+                        </div>
+                        <div class="form-group" id="default-icon-color-group">
+                            <label for="default-social-icon-color">Default Icon Color</label>
+                            <input type="color" id="default-social-icon-color" value="#FFFFFF">
+                        </div>
+                        <div class="form-group" id="full-label-alignment-group" style="display: none;">
+                            <label for="full-label-alignment">Full Label Alignment</label>
+                            <select id="full-label-alignment">
+                                <option value="left">Left</option>
+                                <option value="center" selected>Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                        <!-- NEW: Add Label button -->
+                        <div style="margin-top:0.75rem;">
+                            <button id="add-label-btn" class="text-btn"><i class="fas fa-tag"></i> Add Label</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Layout -->
+                <div id="tab-layout" class="tab-pane">
+                    <div class="section-content">
+                        <label>Card Size</label>
+                        <div class="size-selector" id="card-size-selector">
+                            <button class="size-option active" data-size="standard">Standard</button>
+                            <button class="size-option" data-size="compact">Compact</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer class="builder-footer">
+                <!-- Save button moved to mobile-action-bar for mobile view -->
+                <div class="footer-controls-desktop">
+                    <div class="undo-redo-controls desktop-undo-redo">
+                        <button id="undo-btn" class="control-btn" disabled><i class="fas fa-undo-alt"></i> Undo</button>
+                        <button id="redo-btn" class="control-btn" disabled><i class="fas fa-redo-alt"></i> Redo</button>
+                    </div>
+                    <div class="action-buttons-desktop">
+                        <button id="save-btn" class="gold-btn">Save Card</button>
+                        <button id="clear-btn" class="gold-btn clear">Clear All</button>
+                    </div>
+                </div>
+
+                <!-- Footer shown only inside builder panel -->
+                <div class="builder-footer-info">
+                    <p class="footer-info">Powered by OROVIA · Design & Development by <a href="https://amigodz.nl" target="_blank" rel="noopener noreferrer">Amigodz.nl</a></p>
+                </div>
+            </footer>
+        </aside>
+
+        <!-- ================== PREVIEW PANEL (RIGHT) ================== -->
+        <main class="preview-panel">
+            <div id="ecard-preview" class="ecard theme-luxury size-standard">
+                <div class="floating-emoji-container" aria-hidden="true"></div>
+                
+                <div class="card-content">
+                    <img id="preview-photo" src="adnan.jpg" alt="Profile Photo" class="preview-photo">
+                    <h1 id="preview-name" class="preview-name">Adnan Kousa</h1>
+                    <p id="preview-title" class="preview-title">Social Media Marketer | Videographer</p>
+                    <p id="preview-company" class="preview-company"></p>
+                    <p id="preview-address" class="preview-address"></p>
+                    <p id="preview-quote" class="preview-quote"></p>
+
+                    <div id="preview-links-container" class="links-full-label">
+                        <!-- Social links are dynamically generated here -->
+                    </div>
+                    
+                    <a id="preview-vcard" href="#" download="contact.vcf" class="vcard-btn">
+                        <i class="fas fa-download"></i>
+                        <span>Save Contact</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="save-feedback" class="save-feedback">
+        <div class="checkmark">✓</div>
+        <span>Card Saved!</span>
+    </div>
+
+    <!-- Mobile Action Bar -->
+    <div id="mobile-action-bar" class="mobile-action-bar">
+        <div class="mobile-action-buttons">
+            <button id="undo-btn" class="control-btn" disabled><i class="fas fa-undo-alt"></i> Undo</button>
+            <button id="redo-btn" class="control-btn" disabled>Redo <i class="fas fa-redo-alt"></i></button>
+            <button id="save-btn" class="gold-btn">Save Card</button>
+        </div>
+        <!-- Mobile-only footer text (shows only on mobile) -->
+        <div class="mobile-footer-info mobile-only-footer">
+            Powered by OROVIA · Design & Development by <a href="https://amigodz.nl" target="_blank" rel="noopener noreferrer">Amigodz.nl</a>
+        </div>
+    </div>
+
+    <!-- Global footer removed (footer is now inside builder panel only) -->
+
+    <script src="script.js"></script>
+</body>
+</html>
