@@ -101,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
         socialLayout: 'full-label',
         fullLabelAlignment: 'center',
         defaultSocialIconColor: '#FFFFFF',
-        cardSize: 'standard',
         typography: {
             name: {
                 fontFamily: "'Poppins', sans-serif",
@@ -355,13 +354,6 @@ document.addEventListener('DOMContentLoaded', function() {
         controls.defaultSocialIconColor.addEventListener('change', e => updateState({ defaultSocialIconColor: e.target.value }, true));
         controls.fullLabelAlignment.addEventListener('change', e => updateState({ fullLabelAlignment: e.target.value }));
 
-        // Card Size controls
-        controls.cardSizeSelector.addEventListener('click', e => {
-            if (e.target.classList.contains('size-option')) {
-                updateState({ cardSize: e.target.dataset.size });
-            }
-        });
-
         // Save/Clear/Undo/Redo
         controls.saveBtn.addEventListener('click', saveCardState);
         controls.clearBtn.addEventListener('click', clearAll);
@@ -556,8 +548,8 @@ document.addEventListener('DOMContentLoaded', function() {
             preview.photo.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)';
         }
 
-        // Update card theme and size
-        ecard.className = `ecard theme-${cardState.theme} size-${cardState.cardSize}`;
+        // Update card theme
+        ecard.className = `ecard theme-${cardState.theme}`;
 
         // Update typography
         applyTypography(preview.name, cardState.typography.name);
@@ -667,11 +659,6 @@ document.addEventListener('DOMContentLoaded', function() {
             controls.fullLabelAlignment.value = cardState.fullLabelAlignment;
         }
 
-        // Update card size selector active state
-        controls.cardSizeSelector.querySelectorAll('.size-option').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.size === cardState.cardSize);
-        });
-
         // Update typography controls
         const typographyElements = ['name', 'title', 'company', 'address', 'quote'];
         typographyElements.forEach(element => {
@@ -723,12 +710,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const file = event.target.files[0];
         if (file) {
             try {
-                // Assuming window.websim.upload exists and returns a URL
-                const imageUrl = await window.websim.upload(file);
+                let imageUrl = null;
+                // Prefer websim.uploadFile if available
+                if (window.websim && typeof window.websim.uploadFile === 'function') {
+                    imageUrl = await window.websim.uploadFile(file);
+                } else if (window.websim && typeof window.websim.upload === 'function') {
+                    // Backwards compatible: try upload()
+                    imageUrl = await window.websim.upload(file);
+                } else {
+                    // Fallback: create a local object URL so the user can see the image immediately
+                    imageUrl = URL.createObjectURL(file);
+                }
                 updateState({ photo: imageUrl });
+                // Reset input so selecting the same file again will trigger change
+                event.target.value = '';
             } catch (error) {
                 console.error('Error uploading photo:', error);
-                alert('Failed to upload photo. Please try again.');
+                // If the upload failed but we still have a file, show it locally as a fallback
+                try {
+                    const fallbackUrl = URL.createObjectURL(file);
+                    updateState({ photo: fallbackUrl });
+                    event.target.value = '';
+                } catch (e) {
+                    alert('Failed to upload photo. Please try again.');
+                }
             }
         }
     }
@@ -801,7 +806,6 @@ document.addEventListener('DOMContentLoaded', function() {
             font-weight: ${typ.fontWeight || 'inherit'};
             text-align: ${typ.textAlign || 'inherit'};
             color: ${typ.color || 'inherit'};
-            display: block;
         `;
 
         const labelText = isCustom && link.customName ? link.customName : socialInfo.label;
@@ -920,6 +924,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleSocialLinkInput(e) {
         // Find nearest social-link-group container safely
         const container = e.target.closest('.social-link-group');
+
+        // NEW: Handle delegated change from custom icon file input directly
+        if (e.target.classList && e.target.classList.contains('custom-icon-upload-input')) {
+            // Try to find index from input dataset, or from closest container as fallback
+            const indexFromInput = e.target.dataset.index !== undefined ? parseInt(e.target.dataset.index, 10) : NaN;
+            const index = !isNaN(indexFromInput) ? indexFromInput : parseInt(container?.dataset.index, 10);
+            if (!isNaN(index)) {
+                handleCustomIconUpload(e.target, index);
+            }
+            return; // handled, don't continue with other input logic
+        }
+
         if (!container) return; // Not inside a social link row — ignore
 
         const index = parseInt(container.dataset.index, 10);
@@ -977,13 +993,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const file = inputElement.files[0];
         if (file) {
             try {
-                const imageUrl = await window.websim.upload(file);
+                let imageUrl = null;
+                if (window.websim && typeof window.websim.uploadFile === 'function') {
+                    imageUrl = await window.websim.uploadFile(file);
+                } else if (window.websim && typeof window.websim.upload === 'function') {
+                    imageUrl = await window.websim.upload(file);
+                } else {
+                    imageUrl = URL.createObjectURL(file);
+                }
                 const updatedLinks = [...cardState.socialLinks];
                 updatedLinks[index].customIconUrl = imageUrl;
                 updateState({ socialLinks: updatedLinks });
+                // Reset input so re-upload of same file works
+                inputElement.value = '';
             } catch (error) {
                 console.error('Error uploading custom icon:', error);
-                alert('Failed to upload custom icon. Please try again.');
+                // Try local fallback
+                try {
+                    const fallbackUrl = URL.createObjectURL(file);
+                    const updatedLinks = [...cardState.socialLinks];
+                    updatedLinks[index].customIconUrl = fallbackUrl;
+                    updateState({ socialLinks: updatedLinks });
+                    inputElement.value = '';
+                } catch (e) {
+                    alert('Failed to upload custom icon. Please try again.');
+                }
             }
         }
     }
@@ -1077,14 +1111,19 @@ document.addEventListener('DOMContentLoaded', function() {
         listElement.addEventListener('dragover', (e) => {
             e.preventDefault(); // Allow drop
             const currentItem = e.target.closest('.draggable-item');
-            if (currentItem && currentItem !== draggedItem) {
-                const bounding = currentItem.getBoundingClientRect();
-                const offset = bounding.y + (bounding.height / 2);
-                if (e.clientY - offset > 0) {
+            // Safety guards: ensure both draggedItem and currentItem are valid Nodes and different
+            if (!draggedItem || !currentItem || draggedItem === currentItem) return;
+            const bounding = currentItem.getBoundingClientRect();
+            const offset = bounding.y + (bounding.height / 2);
+            // Only attempt insert when both nodes are valid
+            if (e.clientY - offset > 0) {
+                if (currentItem.nextSibling) {
                     listElement.insertBefore(draggedItem, currentItem.nextSibling);
                 } else {
-                    listElement.insertBefore(draggedItem, currentItem);
+                    listElement.appendChild(draggedItem);
                 }
+            } else {
+                listElement.insertBefore(draggedItem, currentItem);
             }
         });
 
@@ -1438,7 +1477,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearAll() {
         if (confirm('Are you sure you want to clear all customizations? This cannot be undone (except by hitting Undo right after).')) {
             localStorage.removeItem('ecardState');
-            cardState = { // Reset to initial state
+            cardState = {
                 name: 'Alex Morgan',
                 title: 'Creative Director',
                 company: 'Visionary Studio',
@@ -1474,7 +1513,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 socialLayout: 'full-label',
                 fullLabelAlignment: 'center',
                 defaultSocialIconColor: '#FFFFFF',
-                cardSize: 'standard',
                 typography: {
                     name: {
                         fontFamily: "'Poppins', sans-serif",
@@ -1588,9 +1626,20 @@ document.addEventListener('DOMContentLoaded', function() {
         controls.socialLayoutSelector = document.getElementById('social-layout-selector');
         controls.defaultSocialIconColor = document.getElementById('default-social-icon-color');
         controls.defaultIconColorGroup = document.getElementById('default-icon-color-group');
-        controls.cardSizeSelector = document.getElementById('card-size-selector');
         controls.saveBtn = document.getElementById('save-btn');
         controls.clearBtn = document.getElementById('clear-btn');
+        // Mobile clear button (if present) - wire it to same clear handler
+        const mobileClearBtn = document.getElementById('clear-btn-mobile');
+        if (mobileClearBtn && !controls.clearBtn) {
+            // If desktop clear not found, use mobile as primary
+            controls.clearBtn = mobileClearBtn;
+        }
+        if (mobileClearBtn) {
+            mobileClearBtn.addEventListener('click', (e) => {
+                // Reuse existing clearAll function
+                clearAll();
+            });
+        }
         controls.builderTabs = document.querySelector('.builder-tabs');
         controls.tabPanes = document.querySelectorAll('.tab-pane');
         controls.fullLabelAlignment = document.getElementById('full-label-alignment');
