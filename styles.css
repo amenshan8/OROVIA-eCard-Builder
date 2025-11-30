@@ -649,14 +649,31 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; 
     cursor: pointer;
 }
 
-.social-link-group .social-custom-color::-webkit-color-swatch-wrapper,
-.social-link-group .social-outline-glow-color::-webkit-color-swatch-wrapper {
+/* Ensure color pickers used for social title / label match button sizes and spacing */
+.social-link-group .social-title-color,
+.social-link-group .social-custom-color,
+.social-link-group .social-outline-glow-color,
+.social-link-group .upload-custom-icon-btn {
+    width: 44px; /* Match square size */
+    min-width: 44px;
+    height: 44px;
     padding: 0;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    background-clip: padding-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
+
+/* Make sure color swatch inside inputs displays cleanly on WebKit */
+.social-link-group .social-title-color::-webkit-color-swatch,
 .social-link-group .social-custom-color::-webkit-color-swatch,
 .social-link-group .social-outline-glow-color::-webkit-color-swatch {
     border: none;
     border-radius: 6px;
+    padding: 0;
 }
 
 .text-btn {
@@ -1585,7 +1602,7 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; 
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     border-radius: 50px;
     color: var(--text-primary);
@@ -1808,9 +1825,9 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; 
     .app-container {
         grid-template-columns: 1fr; /* Single column layout */
         grid-template-rows: auto 1fr; /* Preview takes content height, builder takes remaining */
-        grid-template-areas: 
-            "preview"
-            "builder"; /* Preview on top, Builder below */
+        grid-template-areas:
+            "builder"
+            "preview"; /* Builder on top, Preview below */
         height: auto; /* Allow height to adapt to content */
         /* Add padding-bottom to prevent content from being obscured by the fixed action bar */
         padding-bottom: calc(5rem + 1.15rem + env(safe-area-inset-bottom)); /* Estimated action bar height + new footer text + safe area */
@@ -1818,10 +1835,10 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; 
 
     .builder-panel {
         /* Override 1024px settings for smaller screens */
-        border-bottom: none; /* No bottom border as it's the last main section */
-        padding: 2rem 1rem; /* More generous vertical padding for overall builder panel */
-        /* Add padding-bottom to ensure content scrolls above the sticky bar */
-        padding-bottom: calc(2rem + 5rem + 1.15rem + env(safe-area-inset-bottom)); /* Content padding + action bar height + new footer text + safe area */
+        border-bottom: 1px solid var(--border-color); /* restore bottom border for separation on mobile */
+        padding: 1.5rem; /* keep compact padding consistent with tablet */
+        /* Ensure content scrolls above the sticky bar */
+        padding-bottom: calc(2rem + 5rem + 1.15rem + env(safe-area-inset-bottom));
     }
 
     .preview-panel {
@@ -1925,9 +1942,10 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; 
         min-height: 48px; /* Fixed height for better tap target */
     }
 
-    .mobile-action-bar .control-btn i,
-    .mobile-action-bar .gold-btn i {
-        margin-right: 0.25rem; /* Adjust icon spacing */
+    /* Make Clear All visually consistent and not too large on mobile */
+    #clear-btn-mobile {
+        min-width: 0;
+        padding: 0.7rem 0.6rem;
     }
 
     /* Hide desktop footer on mobile */
@@ -1939,8 +1957,48 @@ hr { border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0; 
     .mobile-only-footer {
         display: block; 
     }
-}
 
+    /* --- MOBILE-SPECIFIC FIXES REQUESTED --- */
+
+    /* 1) Social media dropdown: ensure it is fixed, centered vertically, scrollable, and readable on mobile */
+    .dropdown-options-list {
+        position: fixed !important;
+        top: 20% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+        background-color: rgba(0,0,0,0.95) !important;
+        border-radius: 12px !important;
+        padding: 0.5rem !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 15px var(--glow-color) !important;
+        -webkit-overflow-scrolling: touch; /* smoother scrolling on iOS */
+        width: min(calc(100% - 32px), 360px) !important; /* keep it readable and not full-bleed */
+        left: 50% !important;
+        transform: translate(-50%, 0) !important;
+        z-index: 1200 !important;
+    }
+
+    /* Ensure each option remains tappable and not too close to edges on mobile */
+    .dropdown-options-list li {
+        padding: 0.9rem 1rem;
+        font-size: 1.05rem;
+        border-radius: 8px;
+        margin: 0.25rem;
+    }
+
+    /* 2) Clear All button visibility & sizing on mobile (only mobile) */
+    #clear-btn {
+        display: block !important;
+        margin-top: 12px !important;
+        max-width: 90% !important;
+        width: auto !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box;
+    }
+
+}
 /* For screens where mobile-action-bar is hidden (desktop/tablet landscape) */
 @media (min-width: 769px) {
     .app-footer {
