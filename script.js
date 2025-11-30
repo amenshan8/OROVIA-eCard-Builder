@@ -201,8 +201,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateUndoRedoButtons() {
-        controls.undoBtn.disabled = historyPointer <= 0;
-        controls.redoBtn.disabled = historyPointer >= history.length - 1;
+        const undoDisabled = historyPointer <= 0;
+        const redoDisabled = historyPointer >= history.length - 1;
+        if (controls.undoBtns && controls.undoBtns.length) {
+            controls.undoBtns.forEach(b => b.disabled = undoDisabled);
+        }
+        if (controls.redoBtns && controls.redoBtns.length) {
+            controls.redoBtns.forEach(b => b.disabled = redoDisabled);
+        }
     }
 
     // --- DOM ELEMENT SELECTORS ---
@@ -357,8 +363,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Save/Clear/Undo/Redo
         controls.saveBtn.addEventListener('click', saveCardState);
         controls.clearBtn.addEventListener('click', clearAll);
-        controls.undoBtn.addEventListener('click', undo);
-        controls.redoBtn.addEventListener('click', redo);
+        // Attach undo/redo to all matching buttons (desktop + mobile)
+        if (controls.undoBtns && controls.undoBtns.length) {
+            controls.undoBtns.forEach(btn => btn.addEventListener('click', undo));
+        }
+        if (controls.redoBtns && controls.redoBtns.length) {
+            controls.redoBtns.forEach(btn => btn.addEventListener('click', redo));
+        }
 
         // Tab navigation
         controls.builderTabs.addEventListener('click', e => {
@@ -1640,12 +1651,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearAll();
             });
         }
+        // Collect all undo/redo buttons (desktop + mobile) so they work on every device
+        controls.undoBtns = Array.from(document.querySelectorAll('#undo-btn'));
+        controls.redoBtns = Array.from(document.querySelectorAll('#redo-btn'));
+        
         controls.builderTabs = document.querySelector('.builder-tabs');
         controls.tabPanes = document.querySelectorAll('.tab-pane');
         controls.fullLabelAlignment = document.getElementById('full-label-alignment');
 
-        controls.undoBtn = document.getElementById('undo-btn');
-        controls.redoBtn = document.getElementById('redo-btn');
+        controls.undoBtn = controls.undoBtns[0] || null;
+        controls.redoBtn = controls.redoBtns[0] || null;
 
         controls.nameFontFamily = document.getElementById('name-font-family');
         controls.nameFontSize = document.getElementById('name-font-size');
